@@ -1,12 +1,30 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
-import { View } from "react-native";
+import { Tabs, usePathname, useRouter } from "expo-router";
+import { Pressable, View } from "react-native";
 
 export default function TabsLayout() {
+  const router = useRouter();
+  const pathName = usePathname();
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#C85047",
+        headerRight: () => (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: `/search`,
+                params: {
+                  tabName: pathName === "/" ? "Home" : pathName.charAt(1).toUpperCase() + pathName.slice(2),
+                },
+              })
+            }
+            style={{ paddingHorizontal: 12 }}
+          >
+            <Ionicons name="search-sharp" size={22} />
+          </Pressable>
+        ),
       }}
     >
       <Tabs.Screen
@@ -65,6 +83,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: "Profile",
+          headerRight: () => null,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "person-sharp" : "person-outline"}
