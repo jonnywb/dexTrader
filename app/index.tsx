@@ -18,7 +18,7 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      fetchClaims(); // Fixed: removed the trailing (
+      fetchClaims();
     });
 
     return () => subscription.unsubscribe();
