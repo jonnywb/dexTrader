@@ -1,15 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Image, Pressable, useColorScheme, View } from "react-native";
 
 export default function TabsLayout() {
   const router = useRouter();
   const pathName = usePathname();
+  const colorScheme = useColorScheme();
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#C85047",
+        headerLeft: () => (
+          <Image
+            source={require(`@/assets/images/logo-header.png`)}
+            style={{ width: 40, height: 40, marginLeft: 16, tintColor: colorScheme === "dark" ? "#fff" : "#000" }}
+            resizeMode="contain"
+          />
+        ),
+        headerTitle: "DexTrader",
+        headerShadowVisible: false,
         headerRight: () => (
           <Pressable
             onPress={() =>
