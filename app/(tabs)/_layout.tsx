@@ -1,6 +1,8 @@
+import Logo from "@/assets/logo.svg";
+import { DexTheme } from "@/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
-import { Image, Pressable, useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -10,16 +12,21 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#C85047",
-        headerLeft: () => (
-          <Image
-            source={require(`@/assets/images/logo-header.png`)}
-            style={{ width: 40, height: 40, marginLeft: 16, tintColor: colorScheme === "dark" ? "#fff" : "#000" }}
-            resizeMode="contain"
-          />
-        ),
-        headerTitle: "DexTrader",
-        headerShadowVisible: false,
+        tabBarStyle: {
+          borderTopWidth: 1.5,
+          borderColor: DexTheme.colors.dexBorder,
+          backgroundColor: DexTheme.colors.dexSurface,
+        },
+        headerTitleStyle: {
+          color: DexTheme.colors.dexText,
+        },
+        headerStyle: {
+          borderBottomWidth: 1.5,
+          borderBottomColor: DexTheme.colors.dexBorder,
+          backgroundColor: DexTheme.colors.dexSurface,
+        },
+        tabBarActiveTintColor: DexTheme.colors.dexAccent,
+        headerLeft: () => <Logo width={100} height={20} />,
         headerRight: () => (
           <Pressable
             onPress={() =>
@@ -30,9 +37,9 @@ export default function TabsLayout() {
                 },
               })
             }
-            style={{ paddingHorizontal: 12 }}
+            className="px-4"
           >
-            <Ionicons name="search-sharp" size={22} />
+            <Ionicons name="search-sharp" size={22} color={DexTheme.colors.dexText} />
           </Pressable>
         ),
       }}
@@ -42,7 +49,11 @@ export default function TabsLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "home-sharp" : "home-outline"} size={24} color={focused ? "#C85047" : "#777"} />
+            <Ionicons
+              name="home-outline"
+              size={24}
+              color={focused ? DexTheme.colors.dexAccent : DexTheme.colors.dexTextMuted}
+            />
           ),
         }}
       />
@@ -51,7 +62,11 @@ export default function TabsLayout() {
         options={{
           title: "Collection",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "book-sharp" : "book-outline"} size={24} color={focused ? "#C85047" : "#777"} />
+            <Ionicons
+              name="book-outline"
+              size={24}
+              color={focused ? DexTheme.colors.dexAccent : DexTheme.colors.dexTextMuted}
+            />
           ),
         }}
       />
@@ -75,7 +90,11 @@ export default function TabsLayout() {
                 shadowRadius: 4,
               }}
             >
-              <Ionicons name={focused ? "scan-sharp" : "scan-outline"} size={44} color={focused ? "#A8B8C8" : "#fff"} />
+              <Ionicons
+                name="scan-outline"
+                size={44}
+                color={focused ? DexTheme.colors.dexAccent : DexTheme.colors.dexText}
+              />
             </View>
           ),
         }}
@@ -85,7 +104,7 @@ export default function TabsLayout() {
         options={{
           title: "Wishlist",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "heart-sharp" : "heart-outline"} size={24} color={focused ? "#C85047" : "#777"} />
+            <Ionicons name="heart-outline" size={24} color={focused ? "#F4D03F" : "#777"} />
           ),
         }}
       />
@@ -95,11 +114,7 @@ export default function TabsLayout() {
           title: "Profile",
           headerRight: () => null,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person-sharp" : "person-outline"}
-              size={24}
-              color={focused ? "#C85047" : "#777"}
-            />
+            <Ionicons name="person-outline" size={24} color={focused ? "#F4D03F" : "#777"} />
           ),
         }}
       />

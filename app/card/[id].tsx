@@ -1,5 +1,7 @@
+import { Screen } from "@/components/ui/Screen";
+import { Body } from "@/components/ui/Typography";
+import { DexTheme } from "@/theme/theme";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
 
 // FOR DEV PURPOSES, DELETE LATER
 const cards = [
@@ -15,16 +17,27 @@ export default function CardScreen() {
 
   if (!card) {
     return (
-      <View>
-        <Text>Card not found...</Text>
-      </View>
+      <Screen>
+        <Body>Card not found...</Body>
+      </Screen>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: cardName, headerBackTitle: "Collection" }} />
-      <Text>{card.name}</Text>
-    </View>
+    <Screen style={{ flex: 1 }}>
+      <Stack.Screen
+        options={{
+          headerStyle: {
+            backgroundColor: "#1E1E1E",
+          },
+          title: cardName,
+          headerBackTitle: "Collection",
+          headerBackTitleStyle: {
+            fontFamily: DexTheme.fonts.body,
+          },
+        }}
+      />
+      <Body>{card.name}</Body>
+    </Screen>
   );
 }

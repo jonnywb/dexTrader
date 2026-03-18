@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/Button";
+import { Screen } from "@/components/ui/Screen";
+import { HeadingXL } from "@/components/ui/Typography";
 import supabase from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
@@ -27,28 +29,9 @@ export default function Profile() {
   };
 
   return (
-    <View style={styles.container}>
-      {user && <Text style={styles.headerText}>{user.email}</Text>}
-      <Pressable onPress={handleSignOut} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Log out</Text>
-      </Pressable>
-    </View>
+    <Screen>
+      {user && <HeadingXL>{user.email}</HeadingXL>}
+      <Button onPress={handleSignOut} label="Log Out" />
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerText: { fontSize: 30 },
-  logoutButton: {
-    width: 250,
-    backgroundColor: "#a82028",
-    padding: 10,
-    borderRadius: 3,
-    alignItems: "center",
-  },
-  logoutText: { color: "white", fontSize: 17 },
-});

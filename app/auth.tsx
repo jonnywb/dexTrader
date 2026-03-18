@@ -1,10 +1,11 @@
 import { HeaderLogo } from "@/components/Logo";
+import { Button } from "@/components/ui/Button";
 import { createSessionFromUrl } from "@/lib/authSession";
 import supabase from "@/lib/supabase";
 import { makeRedirectUri } from "expo-auth-session";
 import { useLinkingURL } from "expo-linking";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Text, TextInput, View } from "react-native";
 
 const regex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -124,12 +125,8 @@ export default function Auth() {
         )}
 
         <View className="flex-row w-full gap-2">
-          <Pressable onPress={handleSignIn} className="bg-dexAccent p-4 rounded flex-1">
-            <Text>Login / Sign Up</Text>
-          </Pressable>
-          <Pressable onPress={handleVerifyOtp} className="bg-dexAccent p-4 rounded flex-1">
-            <Text>Login With Code</Text>
-          </Pressable>
+          <Button onPress={handleSignIn} label="Sign In / Sign Up" className="flex-1" />
+          <Button onPress={handleVerifyOtp} label="Login With Code" className="flex-1" />
         </View>
       </View>
 

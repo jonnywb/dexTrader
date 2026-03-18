@@ -25,6 +25,11 @@ module.exports = {
         dexLoss: "#E74C3C",
         dexGrade: "#F39C12",
       },
+      fontFamily: {
+        heading: ["SpaceGrotesk-Bold", "System"], //Logo and Big Headings
+        body: ["Inter", "System"], //Labels + Body
+        mono: ["JetBrains Mono", "System"], //Prices and Grades
+      },
     },
   },
   plugins: [],
