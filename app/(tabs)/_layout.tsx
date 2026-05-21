@@ -1,4 +1,4 @@
-import Logo from "@/assets/logo.svg";
+import { HeaderLogo } from "@/components/Logo";
 import { DexTheme } from "@/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, usePathname, useRouter } from "expo-router";
@@ -26,7 +26,7 @@ export default function TabsLayout() {
           backgroundColor: DexTheme.colors.dexSurface,
         },
         tabBarActiveTintColor: DexTheme.colors.dexAccent,
-        headerLeft: () => <Logo width={100} height={20} />,
+        headerLeft: () => <HeaderLogo height={27} containerClassName="w-full items-end ml-3" />,
         headerRight: () => (
           <Pressable
             onPress={() =>

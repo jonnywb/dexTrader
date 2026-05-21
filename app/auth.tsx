@@ -1,73 +1,107 @@
 import { HeaderLogo } from "@/components/Logo";
 import { Button } from "@/components/ui/Button";
-import { createSessionFromUrl } from "@/lib/authSession";
 import supabase from "@/lib/supabase";
+import { DexTheme } from "@/theme/theme";
 import { makeRedirectUri } from "expo-auth-session";
-import { useLinkingURL } from "expo-linking";
-import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { KeyboardAvoidingView, Platform, Switch, Text, TextInput, View } from "react-native";
 
-const regex =
+type Step = "email" | "code";
+type AsyncStatus = "idle" | "loading" | "error";
+
+const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+const usernameRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9._-]{1,18}[a-zA-Z0-9])?$/;
+
 export default function Auth() {
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  //INPUT
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
-  const [otpStatus, setOtpStatus] = useState<"idle" | "verifying" | "ok" | "error">("idle");
+
+  //Layout
+  const [showSignup, setShowSignup] = useState<boolean>(false);
+
+  //STATUS
+  const [step, setStep] = useState<Step>("email");
+  const [status, setStatus] = useState<AsyncStatus>("idle");
+
+  //ERROR
+  const [errorMessage, setErrorMessage] = useState("");
   const [otpError, setOtpError] = useState("");
-  const url = useLinkingURL();
-  const showInput = status === "idle" || status === "error";
 
-  useEffect(() => {
-    const handleUrl = async () => {
-      if (!url) return;
-
-      try {
-        const session = await createSessionFromUrl(url);
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    };
-
-    handleUrl();
-  }, [url]);
-
-  const handleSignIn = async () => {
+  const handleSendCode = async () => {
     const redirectTo = makeRedirectUri({ scheme: "dextrader", path: "auth" });
 
-    setStatus("sending");
+    setStatus("loading");
     setErrorMessage("");
 
-    if (!regex.test(email)) {
+    if (!emailRegex.test(email)) {
       setErrorMessage("Please enter a valid email address");
       setStatus("error");
       return;
     }
-    try {
-      await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
-      setStatus("sent");
-    } catch (error) {
-      setStatus("error");
-      setErrorMessage("Something went wrong sending the magic link");
-      console.error(error);
+
+    if (showSignup) {
+      if (!usernameRegex.test(username)) {
+        setErrorMessage("Please enter a valid username");
+        setStatus("error");
+        return;
+      }
+    }
+
+    if (!showSignup) {
+      try {
+        await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: redirectTo,
+            shouldCreateUser: false,
+          },
+        });
+        setStatus("idle");
+        setStep("code");
+      } catch (error) {
+        setStatus("error");
+        setErrorMessage("Something went wrong sending the magic link");
+        console.error(error);
+      }
+    } else {
+      try {
+        await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: redirectTo,
+            data: {
+              username,
+            },
+          },
+        });
+
+        setStatus("idle");
+        setStep("code");
+      } catch (error) {
+        setStatus("error");
+        setErrorMessage("Something went wrong sending the magic link, please try again");
+        console.error(error);
+      }
     }
   };
 
   const handleVerifyOtp = async () => {
-    setOtpStatus("verifying");
+    setStatus("loading");
     setOtpError("");
 
-    if (!regex.test(email)) {
-      setOtpStatus("error");
+    if (!emailRegex.test(email)) {
+      setStatus("error");
       setOtpError("Please enter a valid email address first");
       return;
     }
 
     if (!otp || otp.length < 4) {
-      setOtpStatus("error");
+      setStatus("error");
       setOtpError("Please enter the code from your email");
       return;
     }
@@ -80,18 +114,25 @@ export default function Auth() {
       });
 
       if (error) {
-        setOtpStatus("error");
+        setStatus("error");
         setOtpError("Invalid or expired code");
         console.error(error);
         return;
       }
 
-      setOtpStatus("ok");
+      setStatus("idle");
     } catch (error) {
       console.error(error);
-      setOtpStatus("error");
+      setStatus("error");
       setOtpError("Something went wrong verifying the code");
     }
+  };
+
+  const toggleSwitch = () => setShowSignup((showSignup) => !showSignup);
+
+  const handleReset = () => {
+    setStatus("idle");
+    setStep("email");
   };
 
   return (
@@ -101,12 +142,12 @@ export default function Auth() {
     >
       <View className="flex-1" />
 
-      <View className="flex-1 left-5 mt-24">
-        <HeaderLogo />
+      <View className="flex-1 justify-center items-center">
+        <HeaderLogo width={360} containerClassName={"pl-20"} />
       </View>
 
-      <View className="flex-0.5 w-4/5 bg-dexSurfaceElevated p-5 border border-dexBorder rounded items-center gap-2">
-        {showInput && (
+      <View className="w-4/5 bg-dexSurfaceElevated p-5 border border-dexBorder rounded items-center gap-2">
+        {step === "email" && (
           <TextInput
             className="bg-white h-14 w-full px-3 rounded shadow-sm"
             onChangeText={setEmail}
@@ -114,29 +155,54 @@ export default function Auth() {
             placeholder="Email Address"
           />
         )}
-        {status === "sent" && (
+
+        {showSignup && step === "email" && (
           <TextInput
             className="bg-white h-14 w-full px-3 rounded shadow-sm"
-            onChangeText={setOtp}
-            value={otp}
-            placeholder="Enter 8-digit code"
-            keyboardType="number-pad"
+            onChangeText={setUsername}
+            value={username}
+            placeholder="Username"
           />
         )}
 
+        {step === "code" && (
+          <>
+            <Text className="mb-2 text-dexAccent">Please check your email for a login code.</Text>
+            <TextInput
+              className="bg-white h-14 w-full px-3 rounded shadow-sm"
+              onChangeText={setOtp}
+              value={otp}
+              placeholder="Enter 8-digit code"
+              keyboardType="number-pad"
+            />
+          </>
+        )}
+
         <View className="flex-row w-full gap-2">
-          <Button onPress={handleSignIn} label="Sign In / Sign Up" className="flex-1" />
-          <Button onPress={handleVerifyOtp} label="Login With Code" className="flex-1" />
+          {step === "email" && (
+            <Button onPress={handleSendCode} label={showSignup ? "Sign Up" : "Sign In"} className="flex-1" />
+          )}
+
+          {step === "code" && <Button onPress={handleVerifyOtp} label="Login With Code" className="flex-1" />}
         </View>
+
+        {step === "email" && (
+          <View className="flex-row w-full justify-end items-center">
+            <Text className="text-dexTextSecondary mr-2">Sign Up?</Text>
+            <Switch
+              trackColor={{ false: DexTheme.colors.dexBg, true: DexTheme.colors.dexAccentDim }}
+              thumbColor={showSignup ? DexTheme.colors.dexAccent : DexTheme.colors.dexTextMuted}
+              ios_backgroundColor={"#3e3d3e"}
+              onValueChange={toggleSwitch}
+              value={showSignup}
+            />
+          </View>
+        )}
       </View>
 
       <View className="flex-1">
-        {status === "sending" && <Text className="text-dexAccentDim">Sending Magic Link...</Text>}
-        {status === "sent" && <Text className="text-dexAccent">Check your email for a magic link!</Text>}
         {status === "error" && <Text className="text-dexAccentDim">{errorMessage}</Text>}
-        {otpStatus === "verifying" && <Text className="text-dexAccentDim">Verifying code…</Text>}
-        {otpStatus === "ok" && <Text className="text-dexAccentDim">Logged in!</Text>}
-        {otpStatus === "error" && <Text className="text-dexAccentDim">{otpError}</Text>}
+        {step === "code" && <Button onPress={handleReset} label="Go Back" className="bg-dexAccentDim" />}
       </View>
 
       <View className="flex-0.5" />
