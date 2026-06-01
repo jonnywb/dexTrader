@@ -1,18 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Screen } from "@/components/ui/Screen";
+import { HeadingXL } from "@/components/ui/Typography";
 
 export default function Scan() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Scan Screen</Text>
-    </View>
+    <Screen>
+      <HeadingXL>Scan</HeadingXL>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {},
-});

@@ -4,7 +4,7 @@ import { HeadingXL } from "@/components/ui/Typography";
 export default function Wishlist() {
   return (
     <Screen>
-      <HeadingXL>Wishlist Screen</HeadingXL>
+      <HeadingXL>Wishlist</HeadingXL>
     </Screen>
   );
 }

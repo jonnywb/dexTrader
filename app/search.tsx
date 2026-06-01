@@ -1,22 +1,25 @@
+import { Screen } from "@/components/ui/Screen";
+import { DexTheme } from "@/theme/theme";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "react-native";
 
 export default function Search() {
   const { tabName } = useLocalSearchParams<{ tabName: string }>();
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ headerBackTitle: tabName }} />
-      <Text style={styles.text}>Search Screen</Text>
-    </View>
+    <Screen>
+      <Stack.Screen
+        options={{
+          headerBackTitle: tabName,
+          headerTitleStyle: {
+            color: DexTheme.colors.dexText,
+          },
+          headerStyle: {
+            backgroundColor: DexTheme.colors.dexSurface,
+          },
+        }}
+      />
+      <Text>Search Screen</Text>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {},
-});
